@@ -3,7 +3,7 @@
 ## Структура проекта
 
 payment-system/
-├── domain/                   # Доменный слой (бизнес-логика)
+├── domain/                    # Доменный слой (бизнес-логика)
 │   ├── __init__.py
 │   ├── order.py              # Агрегат Order и OrderLine
 │   ├── money.py              # Value Object Money
@@ -23,3 +23,4 @@ payment-system/
 │   └── test_use_cases.py     # Тесты use-case
 ├── requirements.txt          # Зависимости проекта
 └── README.md                 # Этот файл
+
