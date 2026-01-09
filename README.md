@@ -25,3 +25,69 @@ ddd-architecture/
     README.md
     requirements.txt
 </pre>
+
+## Доменная модель
+
+### Сущности
+<code>Order</code> - заказ (корень агрегата)<br>
+<code>OrderLine</code> - строка заказа (часть агрегата)
+
+### Value Objects
+<code>Money</code> - денежная сумма с валютой
+
+### Перечисления
+<code>OrderStatus</code> - статус заказа (DRAFT, PENDING, PAID, CANCELLED)
+
+### Бизнес-инварианты
+1. Нельзя оплатить пустой заказ
+2. Нельзя оплатить заказ повторно
+3. После оплаты нельзя менять строки заказа
+4. Итоговая сумма равна сумме строк
+
+## Интерфейсы
+
+### OrderRepository
+<pre>
+<code>
+def get_by_id(order_id: UUID) -> Order | None
+def save(order: Order) -> None
+</code>
+</pre>
+
+### PaymentGateway
+<pre>
+<code>
+def charge(order_id: UUID, money: Money) -> PaymentResult
+</code>
+</pre>
+
+## Use Cases
+
+### PayOrderUseCase
+Оркестрирует процесс оплаты заказа:
+
+1. Загружает заказ через OrderRepository
+2. Выполняет доменную операцию оплаты
+3. Вызывает платёж через PaymentGateway
+4. Сохраняет заказ
+5. Возвращает результат оплаты
+
+## Запуск тестов
+
+<pre>
+<code>
+# Установка зависимостей
+pip install -r requirements.txt
+
+# Запуск тестов
+pytest
+</code>
+</pre>
+
+## Тестовые сценарии
+
+1. Успешная оплата корректного заказа
+2. Ошибка при оплате пустого заказа
+3. Ошибка при повторной оплате
+4. Невозможность изменения заказа после оплаты
+5. Корректный расчёт итоговой суммы
