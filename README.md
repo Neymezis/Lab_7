@@ -23,7 +23,6 @@ ddd-architecture/
         test_order_domain.py   # Тесты доменной модели
         test_payment_usecase.py # Тесты use-case
     README.md
-    requirements.txt
 </pre>
 
 ## Доменная модель
