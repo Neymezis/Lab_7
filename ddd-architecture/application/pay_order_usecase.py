@@ -3,6 +3,7 @@ from uuid import UUID
 
 from domain.order_aggregate import Order
 from domain.money import Money
+from domain.order_status import OrderStatus
 from .interfaces import OrderRepository, PaymentGateway, PaymentResult
 
 
@@ -24,15 +25,9 @@ class PayOrderUseCase:
         Шаги:
         1. Загрузить заказ из репозитория
         2. Выполнить доменную операцию оплаты
-        3. Вызвать платежный шлюз
-        4. Сохранить обновленный заказ
-        5. Вернуть результат
-        
-        Args:
-            order_id: ID заказа для оплаты
-            
-        Returns:
-            PaymentResult: результат операции оплаты
+        3. Вызвать платёж через PaymentGateway
+        4. Сохранить заказ (только если платеж успешен)
+        5. Вернуть результат оплаты
         """
         # 1. Загружаем заказ
         order = self._order_repository.get_by_id(order_id)
@@ -44,16 +39,22 @@ class PayOrderUseCase:
             )
         
         try:
-            # 2. Доменная операция оплаты
+            # Сохраняем исходный статус
+            original_status = order.status
+            
+            # 2. Доменная операция оплаты (меняет статус на PAID)
             order.pay()
             amount = order.total_amount
             
             # 3. Вызываем платежный шлюз
             payment_result = self._payment_gateway.charge(order_id, amount)
             
-            # Если платеж успешен, сохраняем заказ
+            # 4. Если платеж успешен, сохраняем заказ
             if payment_result.success:
                 self._order_repository.save(order)
+            else:
+                # Если платеж не прошел, восстанавливаем исходный статус
+                order._status = original_status
             
             return payment_result
             
