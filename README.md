@@ -2,24 +2,23 @@
 
 ## Структура проекта
 
-payment-system/
-|-- domain/                    # Доменный слой (бизнес-логика)
-|   |-- __init__.py
-|   |-- order.py              # Агрегат Order и OrderLine
-|   |-- money.py              # Value Object Money
-|   |-- order_status.py       # Enum OrderStatus
-|   `-- exceptions.py         # Доменные исключения
-|-- application/              # Слой приложения (use cases)
-|   |-- __init__.py
-|   |-- interfaces.py         # Интерфейсы OrderRepository и PaymentGateway
-|   `-- use_cases.py          # PayOrderUseCase
-|-- infrastructure/           # Инфраструктурный слой (реализации)
-|   |-- __init__.py
-|   |-- repositories.py       # InMemoryOrderRepository
-|   `-- payment_gateways.py   # FakePaymentGateway
-|-- tests/                    # Тесты
-|   |-- __init__.py
-|   |-- test_domain.py        # Тесты доменной модели
-|   `-- test_use_cases.py     # Тесты use-case
-|-- requirements.txt          # Зависимости проекта
-`-- README.md                 # Этот файл
+ddd-architecture/
+    domain/                    # Доменный слой
+        __init__.py
+        entities.py            # Сущности (Order, OrderLine)
+        value_objects.py       # Value Objects (Money)
+        enums.py               # Перечисления (OrderStatus)
+        exceptions.py          # Доменные исключения
+        interfaces.py          # Интерфейсы (порты)
+    application/               # Слой приложения
+        __init__.py
+        use_cases.py           # Use Cases (PayOrderUseCase)
+    infrastructure/            # Инфраструктурный слой
+        __init__.py
+        repositories.py        # Реализация репозиториев
+        gateways.py            # Реализация шлюзов
+    tests/                     # Тесты
+        __init__.py
+        test_pay_order_use_case.py
+    README.md
+    requirements.txt
