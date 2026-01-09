@@ -4,10 +4,6 @@ from uuid import UUID
 from domain.order_aggregate import Order
 from domain.money import Money
 from domain.order_status import OrderStatus
-from domain.domain_exceptions import (
-    EmptyOrderException,
-    OrderAlreadyPaidException
-)
 from .interfaces import OrderRepository, PaymentGateway, PaymentResult
 
 
@@ -28,17 +24,10 @@ class PayOrderUseCase:
         
         Шаги:
         1. Загрузить заказ из репозитория
-        2. Проверить, можно ли оплатить заказ
-        3. Вызвать платежный шлюз
-        4. Если платеж успешен, выполнить доменную операцию оплаты
-        5. Сохранить обновленный заказ
-        6. Вернуть результат
-        
-        Args:
-            order_id: ID заказа для оплаты
-            
-        Returns:
-            PaymentResult: результат операции оплаты
+        2. Выполнить доменную операцию оплаты
+        3. Вызвать платёж через PaymentGateway
+        4. Сохранить заказ (только если платеж успешен)
+        5. Вернуть результат оплаты
         """
         # 1. Загружаем заказ
         order = self._order_repository.get_by_id(order_id)
@@ -50,21 +39,21 @@ class PayOrderUseCase:
             )
         
         try:
-            # 2. Проверяем, можно ли оплатить заказ (те же проверки, что и в order.pay())
-            if not order.lines:
-                raise EmptyOrderException("Cannot pay empty order")
-            
-            if order.status == OrderStatus.PAID:
-                raise OrderAlreadyPaidException("Order is already paid")
+            # 2. Доменная операция оплаты (проверяет инварианты)
+            order.pay()
+            amount = order.total_amount
             
             # 3. Вызываем платежный шлюз
-            amount = order.total_amount
             payment_result = self._payment_gateway.charge(order_id, amount)
             
-            # 4. Если платеж успешен, выполняем доменную операцию
+            # 4. Если платеж успешен, сохраняем заказ
             if payment_result.success:
-                order.pay()  # Теперь это безопасно - все проверки уже пройдены
                 self._order_repository.save(order)
+            else:
+                # Если платеж не прошел, откатываем статус заказа
+                # В реальной системе здесь была бы транзакция или компенсирующее действие
+                # Для простоты создаем новый объект с исходным статусом
+                order._status = OrderStatus.PENDING
             
             return payment_result
             
