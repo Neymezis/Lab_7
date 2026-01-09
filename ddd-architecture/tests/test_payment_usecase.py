@@ -1,14 +1,16 @@
-from typing import Optional
-from uuid import UUID
+import pytest
+from decimal import Decimal
+from uuid import uuid4
+from datetime import datetime
 
-from domain.order_aggregate import Order
+from domain.order_aggregate import Order, OrderLine
 from domain.money import Money
 from domain.order_status import OrderStatus
-from .interfaces import OrderRepository, PaymentGateway, PaymentResult
-
-
+from application.pay_order_usecase import PayOrderUseCase
+from application.interfaces import PaymentResult
+from infrastructure.order_repository import InMemoryOrderRepository
+from infrastructure.payment_gateway import FakePaymentGateway
 class PayOrderUseCase:
-    """Use Case для оплаты заказа"""
     
     def __init__(
         self, 
