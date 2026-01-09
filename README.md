@@ -4,23 +4,24 @@
 
 <pre>
 ddd-architecture/
-├── domain/                    # Доменный слой
-│   ├── __init__.py
-│   ├── entities.py           # Сущности (Order, OrderLine)
-│   ├── value_objects.py      # Value Objects (Money)
-│   ├── enums.py              # Перечисления (OrderStatus)
-│   ├── exceptions.py         # Доменные исключения
-│   └── interfaces.py         # Интерфейсы (порты)
-├── application/              # Слой приложения
-│   ├── __init__.py
-│   └── use_cases.py          # Use Cases (PayOrderUseCase)
-├── infrastructure/           # Инфраструктурный слой
-│   ├── __init__.py
-│   ├── repositories.py       # Реализация репозиториев
-│   └── gateways.py          # Реализация шлюзов
-├── tests/                   # Тесты
-│   ├── __init__.py
-│   └── test_pay_order_use_case.py
-├── README.md
-└── requirements.txt
+    domain/                    # Доменный слой
+        __init__.py
+        order_aggregate.py     # Агрегат Order с OrderLine
+        money.py               # Value Object Money
+        order_status.py        # Enum OrderStatus
+        domain_exceptions.py   # Доменные исключения
+    application/               # Слой приложения
+        __init__.py
+        interfaces.py          # Интерфейсы репозитория и платежного шлюза
+        pay_order_usecase.py   # PayOrderUseCase
+    infrastructure/            # Инфраструктурный слой
+        __init__.py
+        order_repository.py    # InMemoryOrderRepository
+        payment_gateway.py     # FakePaymentGateway
+    tests/                     # Тесты
+        __init__.py
+        test_order_domain.py   # Тесты доменной модели
+        test_payment_usecase.py # Тесты use-case
+    README.md
+    requirements.txt
 </pre>
